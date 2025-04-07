@@ -1,0 +1,2 @@
+Main-Class: ChatP2P
+Class-Path: .
