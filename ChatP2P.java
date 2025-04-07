@@ -56,3 +56,33 @@ class EnviarMensagens implements Runnable {
         }
     }
 }
+class ReceberMensagens implements Runnable {
+    private final int porta;
+
+    public ReceberMensagens(int porta) {
+        this.porta = porta;
+    }
+
+    @Override
+    public void run() {
+        try (ServerSocket serverSocket = new ServerSocket(porta)) {
+            System.out.println("Aguardando conexões na porta " + porta + "...");
+            while (true) {
+                Socket socket = serverSocket.accept();
+                new Thread(() -> {
+                    try (BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+                        String mensagem;
+                        while ((mensagem = in.readLine()) != null) {
+                            System.out.println("\n[Recebido] " + mensagem);
+                            System.out.print("Você: ");
+                        }
+                    } catch (IOException e) {
+                        System.err.println("Erro ao receber mensagem: " + e.getMessage());
+                    }
+                }).start();
+            }
+        } catch (IOException e) {
+            System.err.println("Erro ao iniciar servidor de recebimento: " + e.getMessage());
+        }
+    }
+}
